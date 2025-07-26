@@ -1,4 +1,4 @@
-# FIndBooks
+# FindBooks
 
 _A semantic book recommendation engine that suggests similar books based on description embeddings, powered by BERT and Streamlit._
 
