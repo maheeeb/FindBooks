@@ -11,6 +11,8 @@ def download_nltk_resources():
     nltk.download('stopwords')
     return True
 
+download_nltk_resources()
+
 # Load data
 @st.cache_data
 def load_data():
@@ -80,24 +82,34 @@ def clean_text(text,
 # Recommend books
 def recommend(user_input, df, model, top_k=3):
     embeddings = load_embeddings()
+    user_input = clean_text(user_input)
     query_embedding = model.encode([user_input])
     sim_scores = cosine_similarity(query_embedding, embeddings)[0]
     top_indices = sim_scores.argsort()[-top_k:][::-1]
     return df.iloc[top_indices]
 
-download_nltk_resources()
 
 # Streamlit UI
-st.title("📚 Book Recommender")
+st.title("FindBooks")
 user_input = st.text_input("Describe a book you like:", "space adventure")
 
 df = load_data()
 model = load_model()
 
+# Add radio button for top_k selection
+top_k = st.radio("How many recommendations?", [3, 5, 10], index=0)
+
 if st.button("Recommend"):
-    recommendations = recommend(user_input, df, model)
-    st.subheader("Top Recommendations:")
+    recommendations = recommend(user_input, df, model, top_k=top_k)
+    st.subheader(f"Top {top_k} Recommendations:")
     for _, row in recommendations.iterrows():
-        st.write(f"**{row['title']}** (Rating: {row['rating']})")
-        st.caption(row["description"])
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            if pd.notna(row['thumbnail']) and row['thumbnail']:
+                st.image(row['thumbnail'], width=100)
+            else:
+                st.write("📚")  # Fallback emoji if no thumbnail
+        with col2:
+            st.write(f"**{row['title']}** (Rating: {row['average_rating']})")
+            st.caption(row["description"])
         st.divider()
