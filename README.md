@@ -2,6 +2,8 @@
 
 _A semantic book recommendation engine that suggests similar books based on description embeddings, powered by BERT and Streamlit._
 
+Find it on findbooks.streamlit.app
+
 ## 🔍 Overview
 This project recommends books by comparing:
 - **BERT embeddings** of book descriptions (pre-computed)
